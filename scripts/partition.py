@@ -45,10 +45,12 @@ for i in range(len(S)):
             VQA_Block("SNOT", targets=[i], initial=True)
             )
 
+print("Running optimization...")
 result = VQA_circuit.optimize_parameters(
         method="BFGS",
         use_jac=True,
-        initialization="random",
+        initial="random",
+        layer_by_layer=False
         )
 result.plot(S)
 print(result)
