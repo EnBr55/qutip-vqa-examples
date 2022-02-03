@@ -47,10 +47,11 @@ def brute_force(S):
 
 
 s = [1, 4, 3] # Problem instance
+s = [48, 52, 60, 39, 6]
 
 VQA_circuit = VQA(
             n_qubits=len(s),
-            n_layers=3,
+            n_layers=20,
             cost_method="OBSERVABLE",
         )
 VQA_circuit.cost_observable = H_P(s)
@@ -73,7 +74,7 @@ result = VQA_circuit.optimize_parameters(
         method="BFGS",
         use_jac=True,
         initial="random",
-        layer_by_layer=False,
+        layer_by_layer=True,
         )
 
 print("Brute force solution:")
