@@ -1,7 +1,7 @@
 import numpy as np
 from qutip import Qobj, tensor
 from qutip_qip.operations import z_gate, x_gate
-from qutip_qip.vqa import VQA, VQA_Block
+from qutip_qip.vqa import VQA, VQABlock
 
 """ Define number-partitioning Hamiltonian  """
 
@@ -14,6 +14,7 @@ def H_P(S):
     for i, s in enumerate(S):
         H += s * z_gate(N=len(S), target=i)
     return pow(H, 2)
+
 
 
 def H_B(S):  # Mixing Hamiltonian
@@ -47,11 +48,10 @@ def brute_force(S):
 
 
 s = [1, 4, 3] # Problem instance
-s = [48, 52, 60, 39, 6]
 
 VQA_circuit = VQA(
             n_qubits=len(s),
-            n_layers=20,
+            n_layers=5,
             cost_method="OBSERVABLE",
         )
 VQA_circuit.cost_observable = H_P(s)
@@ -59,22 +59,21 @@ VQA_circuit.cost_observable = H_P(s)
 # circuit initialisation with SNOT gates
 for i in range(len(s)):
     VQA_circuit.add_block(
-            VQA_Block("SNOT", targets=[i], initial=True)
+            VQABlock("SNOT", targets=[i], initial=True)
             )
 
 VQA_circuit.add_block(
-        VQA_Block(H_P(s), name="H_P")
+        VQABlock(H_P(s), name="H_P")
         )
 VQA_circuit.add_block(
-        VQA_Block(H_B(s), name="H_B")
+        VQABlock(H_B(s), name="H_B")
         )
 
 print("Running optimization...")
 result = VQA_circuit.optimize_parameters(
         method="BFGS",
         use_jac=True,
-        initial="random",
-        layer_by_layer=True,
+        initial="ones",
         )
 
 print("Brute force solution:")

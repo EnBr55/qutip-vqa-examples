@@ -1,7 +1,7 @@
 import numpy as np
 from qutip import Qobj, tensor
 from qutip_qip.operations import z_gate, x_gate
-from qutip_qip.vqa import VQA, VQA_Block
+from qutip_qip.vqa import VQA, VQABlock
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
@@ -86,14 +86,14 @@ VQA_circuit.cost_observable = H_P(V, E)
 # circuit initialisation with SNOT gates
 for i in range(len(V)):
     VQA_circuit.add_block(
-            VQA_Block("SNOT", targets=[i], initial=True)
+            VQABlock("SNOT", targets=[i], initial=True)
             )
 
 VQA_circuit.add_block(
-        VQA_Block(H_P(V, E), name="H_P")
+        VQABlock(H_P(V, E), name="H_P")
         )
 VQA_circuit.add_block(
-        VQA_Block(H_B(V), name="H_B")
+        VQABlock(H_B(V), name="H_B")
         )
 
 result = VQA_circuit.optimize_parameters(
@@ -105,10 +105,12 @@ result = VQA_circuit.optimize_parameters(
 
 bitstring = result.get_top_bitstring().strip('|').strip('>')
 final_cut = bitstring_to_cut(bitstring, E)
-brute_force_cut = brute_force(V, E)
-approximation_ratio = round(final_cut / brute_force_cut[0], 2)
+brute_force_cut, soln_string = brute_force(V, E)
+approximation_ratio = round(final_cut / brute_force_cut, 2)
 
 print(f"Approximation ratio: {approximation_ratio}")
+print(f"Brute force solution: {soln_string}")
+print(f"Found solution: {bitstring}")
 """
 Plot results
 """
@@ -122,4 +124,4 @@ nx.draw(G, pos=pos)
 nx.draw_networkx_labels(G, pos=pos)
 nx.draw_networkx_edge_labels(G, pos=pos, edge_labels=edge_labels, label_pos=.3)
 plot2 = plt.figure(2)
-result.plot(V, label_sets=True, top_ten=True)
+result.plot(range(len(V)), label_sets=True, top_ten=True)
